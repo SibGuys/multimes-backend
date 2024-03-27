@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/messages")
 public class MessagesController {
     private final MessageService messageService;
+    private final Updater updater;
 
-    public MessagesController(MessageService messageService) {
+    public MessagesController(MessageService messageService, Updater updater) {
         this.messageService = messageService;
+        this.updater = updater;
     }
 
     @GetMapping
@@ -30,6 +32,7 @@ public class MessagesController {
     @PostMapping
     public void sendMessage(@RequestBody Message message) {
         messageService.addMessage(message);
+        updater.sendMessage(message);
     }
 
 }
