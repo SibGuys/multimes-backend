@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.multimes.backend.core.web.model.Message;
+import org.multimes.backend.core.web.service.MessageService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,16 +16,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/messages")
 public class MessagesController {
-    List<Message> messageList = new ArrayList<>();
+    private final MessageService messageService;
+
+    public MessagesController(MessageService messageService) {
+        this.messageService = messageService;
+    }
 
     @GetMapping
     public List<Message> getAllMessages() {
-        return messageList;
+        return messageService.getMessages();
     }
 
     @PostMapping
     public void sendMessage(@RequestBody Message message) {
-        messageList.add(message);
+        messageService.addMessage(message);
     }
 
 }
