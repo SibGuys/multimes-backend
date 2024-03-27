@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  ubuntu-java:
+    image: multimes-ubuntu
+    build:
+      context: .
+      dockerfile: .docker/ubuntuDockerfile
+    container_name: multimes_ubuntu
+    restart: unless-stopped
+    network_mode: "host"
+
+  postgres:
+    image: multimes-postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    build:
+      context: .
+      dockerfile: .docker/pgDockerfile
+    container_name: multimes_postgres
+    restart: unless-stopped
+    network_mode: "host"
+
+volumes:
+  pgdata:

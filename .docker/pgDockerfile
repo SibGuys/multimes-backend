@@ -1,0 +1,9 @@
+FROM postgres:latest
+
+ENV POSTGRES_USER=multimes_user
+ENV POSTGRES_PASSWORD=multimes_password
+ENV POSTGRES_DB=multimes_db
+
+COPY src/main/resources/db/init.sql /docker-entrypoint-initdb.d/
+
+EXPOSE 5432

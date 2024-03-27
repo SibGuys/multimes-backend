@@ -1,19 +1,23 @@
 package org.multimes.backend.core.web.config;
 
-import org.springframework.boot.autoconfigure.flyway.FlywayDataSource;
+import javax.sql.DataSource;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.sql.DataSource;
-
 @Configuration
 public class DatabaseConfig {
-    @Bean
-    @FlywayDataSource
-    @ConfigurationProperties(prefix = "spring.datasource.multimes")
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
-    }
+  @Bean
+  @ConfigurationProperties(prefix = "spring.datasource.multimes")
+  public DataSource dataSource() {
+    return DataSourceBuilder.create().build();
+  }
+
+  @Bean
+  public JdbcOperations tasksJdbcOperations(DataSource dataSource) {
+    return new JdbcTemplate(dataSource);
+  }
 }
