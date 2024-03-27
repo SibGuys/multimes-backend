@@ -20,7 +20,6 @@ public class Updater {
         this.bot = bot;
     }
 
-    @Scheduled(fixedRate = 1000)
     public void getUpdates() {
         GetUpdates getUpdates = new GetUpdates();
         bot.execute(getUpdates, new Callback<GetUpdates, GetUpdatesResponse>() {
