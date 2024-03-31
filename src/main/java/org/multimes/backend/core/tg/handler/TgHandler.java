@@ -18,13 +18,13 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 
 @Component
-public class Updater {
+public class TgHandler {
     private final TelegramBot bot;
 
     private final IMessageService messageService;
     private final IInterService interService;
 
-    public Updater(TelegramBot bot, IMessageService messageService, IInterService interService) {
+    public TgHandler(TelegramBot bot, IMessageService messageService, IInterService interService) {
         this.bot = bot;
         this.messageService = messageService;
         this.interService = interService;
