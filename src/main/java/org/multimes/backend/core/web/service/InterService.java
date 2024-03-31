@@ -1,19 +1,25 @@
 package org.multimes.backend.core.web.service;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import org.multimes.backend.core.web.repository.interfaces.IInterRepository;
+import org.multimes.backend.core.web.service.interfaces.IInterService;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InterService {
-    private Set<Long> interIdList = new HashSet<>();
+public class InterService implements IInterService {
 
-    public Set<Long> getInterIdList() {
-        return interIdList;
+    private final IInterRepository interRepository;
+
+    public InterService(IInterRepository interRepository) {
+        this.interRepository = interRepository;
+    }
+
+    public Set<Long> getAll() {
+        return interRepository.getAll();
     }
 
     public void addId(long id) {
-        interIdList.add(id);
+        interRepository.addId(id);
     }
 }

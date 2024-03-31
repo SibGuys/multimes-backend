@@ -1,10 +1,10 @@
 package org.multimes.backend.core.web.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.multimes.backend.core.tg.handler.Updater;
 import org.multimes.backend.core.web.model.Message;
-import org.multimes.backend.core.web.service.MessageService;
+import org.multimes.backend.core.web.service.interfaces.IMessageService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,17 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/messages")
 public class MessagesController {
-    private final MessageService messageService;
+    private final IMessageService messageService;
     private final Updater updater;
 
-    public MessagesController(MessageService messageService, Updater updater) {
+    public MessagesController(IMessageService messageService, Updater updater) {
         this.messageService = messageService;
         this.updater = updater;
     }
 
     @GetMapping
     public List<Message> getAllMessages() {
-        return messageService.getMessages();
+        return messageService.getAll();
     }
 
     @PostMapping

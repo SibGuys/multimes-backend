@@ -1,12 +1,12 @@
-package org.multimes.backend.core.web.controller;
+package org.multimes.backend.core.tg.handler;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 import org.multimes.backend.core.web.model.Message;
-import org.multimes.backend.core.web.service.InterService;
-import org.multimes.backend.core.web.service.MessageService;
+import org.multimes.backend.core.web.service.interfaces.IInterService;
+import org.multimes.backend.core.web.service.interfaces.IMessageService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,17 +21,16 @@ import com.pengrad.telegrambot.response.GetUpdatesResponse;
 public class Updater {
     private final TelegramBot bot;
 
-    private final MessageService messageService;
-    private final InterService interService;
+    private final IMessageService messageService;
+    private final IInterService interService;
 
-    public Updater(TelegramBot bot, MessageService messageService, InterService interService) {
+    public Updater(TelegramBot bot, IMessageService messageService, IInterService interService) {
         this.bot = bot;
         this.messageService = messageService;
         this.interService = interService;
     }
 
     private int oldMesId = -1;
-    private long oldChatId = -1;
 
     @Scheduled(fixedRate = 1000)
     public void getUpdates() {
@@ -40,8 +39,8 @@ public class Updater {
             @Override
             public void onResponse(GetUpdates request, GetUpdatesResponse response) {
                 List<Update> updates = response.updates();
-                Update update = updates.get(updates.size() - 1);
                 if (!updates.isEmpty()) {
+                    Update update = updates.get(updates.size() - 1);
                     int mesId = update.message().messageId();
                     long chatId = update.message().chat().id();
                     if (mesId != oldMesId) {
@@ -50,10 +49,7 @@ public class Updater {
                         messageService.addMessage(new Message(id, text, id, true));
                         oldMesId = mesId;
                     }
-                    if (chatId != oldChatId) {
-                        interService.addId(chatId);
-                        oldChatId = chatId;
-                    }
+                    interService.addId(chatId);
                 } else {
                     System.out.println("LIST IS null");
                 }
@@ -67,7 +63,7 @@ public class Updater {
     }
 
     public void sendMessage(Message message) {
-        Set<Long> list = interService.getInterIdList();
+        Set<Long> list = interService.getAll();
         if (!list.isEmpty()) {
             for (Long id : list) {
                 bot.execute(new SendMessage(id, message.getText()));

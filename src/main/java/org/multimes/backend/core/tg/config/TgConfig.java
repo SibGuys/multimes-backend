@@ -1,4 +1,4 @@
-package org.multimes.backend.core.web.config;
+package org.multimes.backend.core.tg.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
