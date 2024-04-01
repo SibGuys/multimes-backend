@@ -1,11 +1,11 @@
 package org.multimes.backend.core.web.service.interfaces;
 
+import org.multimes.backend.core.web.model.response.MessageResp;
+
 import java.util.List;
 
-import org.multimes.backend.core.web.model.Message;
-
 public interface IMessageService {
-    List<Message> getAll();
+    List<MessageResp> getAll();
 
-    public void addMessage(Message message);
+    public void addMessage(MessageResp message);
 }

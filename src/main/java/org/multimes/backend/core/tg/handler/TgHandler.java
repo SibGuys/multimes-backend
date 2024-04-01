@@ -1,33 +1,33 @@
 package org.multimes.backend.core.tg.handler;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-
-import org.multimes.backend.core.web.model.Message;
-import org.multimes.backend.core.web.service.interfaces.IInterService;
-import org.multimes.backend.core.web.service.interfaces.IMessageService;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
+import org.multimes.backend.core.web.model.Dialog;
+import org.multimes.backend.core.web.model.response.MessageResp;
+import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
+import org.multimes.backend.core.web.service.interfaces.IMessageService;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 @Component
 public class TgHandler {
     private final TelegramBot bot;
 
     private final IMessageService messageService;
-    private final IInterService interService;
+    private final IDialogRepository dialogRepository;
 
-    public TgHandler(TelegramBot bot, IMessageService messageService, IInterService interService) {
+    public TgHandler(TelegramBot bot, IMessageService messageService, IDialogRepository dialogRepository) {
         this.bot = bot;
         this.messageService = messageService;
-        this.interService = interService;
+        this.dialogRepository = dialogRepository;
     }
 
     private int oldMesId = -1;
@@ -43,13 +43,14 @@ public class TgHandler {
                     Update update = updates.get(updates.size() - 1);
                     int mesId = update.message().messageId();
                     long chatId = update.message().chat().id();
+                    String username = update.message().chat().firstName() + " " + update.message().chat().lastName();
                     if (mesId != oldMesId) {
                         String id = String.valueOf(chatId);
                         String text = update.message().text();
-                        messageService.addMessage(new Message(id, text, id, true));
+                        messageService.addMessage(new MessageResp(id, text, id, true));
                         oldMesId = mesId;
                     }
-                    interService.addId(chatId);
+                    dialogRepository.add(new Dialog(chatId, "telegram", username));
                 } else {
                     System.out.println("LIST IS null");
                 }
@@ -62,11 +63,11 @@ public class TgHandler {
         });
     }
 
-    public void sendMessage(Message message) {
-        Set<Long> list = interService.getAll();
-        if (!list.isEmpty()) {
-            for (Long id : list) {
-                bot.execute(new SendMessage(id, message.getText()));
+    public void sendMessage(MessageResp message) {
+        Set<Dialog> set = dialogRepository.getAll();
+        if (!set.isEmpty()) {
+            for (Dialog dialog : set) {
+                bot.execute(new SendMessage(dialog.getId(), message.getText()));
             }
         }
     }

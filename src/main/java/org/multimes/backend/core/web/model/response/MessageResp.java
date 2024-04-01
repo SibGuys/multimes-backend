@@ -1,13 +1,13 @@
-package org.multimes.backend.core.web.model;
+package org.multimes.backend.core.web.model.response;
 
-public class Message {
+public class MessageResp {
     private final String userName;
     private final String text;
     private final String messageTime;
     private final boolean isInter;
 
-    public Message(String userName, String text,
-            String messageTime, boolean isInter) {
+    public MessageResp(String userName, String text,
+                       String messageTime, boolean isInter) {
         this.userName = userName;
         this.text = text;
         this.messageTime = messageTime;
@@ -49,7 +49,7 @@ public class Message {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Message other = (Message) obj;
+        MessageResp other = (MessageResp) obj;
         if (userName == null) {
             if (other.userName != null)
                 return false;
