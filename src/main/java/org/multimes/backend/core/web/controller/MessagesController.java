@@ -1,15 +1,11 @@
 package org.multimes.backend.core.web.controller;
 
-import java.util.List;
-
 import org.multimes.backend.core.tg.handler.TgHandler;
-import org.multimes.backend.core.web.model.Message;
+import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/messages")
@@ -23,12 +19,12 @@ public class MessagesController {
     }
 
     @GetMapping
-    public List<Message> getAllMessages() {
+    public List<MessageResp> getAllMessages() {
         return messageService.getAll();
     }
 
     @PostMapping
-    public void sendMessage(@RequestBody Message message) {
+    public void sendMessage(@RequestBody MessageResp message) {
         messageService.addMessage(message);
         tgHandler.sendMessage(message);
     }

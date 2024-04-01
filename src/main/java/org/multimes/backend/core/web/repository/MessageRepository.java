@@ -1,24 +1,24 @@
 package org.multimes.backend.core.web.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.multimes.backend.core.web.model.Message;
+import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class MessageRepository implements IMessageRepository {
 
-    List<Message> messageList = new ArrayList<>();
+    List<MessageResp> messageList = new ArrayList<>();
 
     @Override
-    public void addMessage(Message message) {
+    public void addMessage(MessageResp message) {
         messageList.add(message);
     }
 
     @Override
-    public List<Message> getAll() {
+    public List<MessageResp> getAll() {
         return messageList;
     }
 

@@ -1,11 +1,11 @@
 package org.multimes.backend.core.web.service;
 
-import java.util.List;
-
-import org.multimes.backend.core.web.model.Message;
+import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MessageService implements IMessageService {
@@ -17,12 +17,12 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public void addMessage(Message message) {
+    public void addMessage(MessageResp message) {
         messageRepository.addMessage(message);
     }
 
     @Override
-    public List<Message> getAll() {
+    public List<MessageResp> getAll() {
         return messageRepository.getAll();
     }
 
