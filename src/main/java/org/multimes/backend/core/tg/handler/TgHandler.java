@@ -14,9 +14,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
-
 @Component
 public class TgHandler {
     private final TelegramBot bot;
@@ -45,9 +46,13 @@ public class TgHandler {
                     long chatId = update.message().chat().id();
                     String username = update.message().chat().firstName() + " " + update.message().chat().lastName();
                     if (mesId != oldMesId) {
-                        String id = String.valueOf(chatId);
                         String text = update.message().text();
-                        messageService.addMessage(new MessageResp(id, text, id, true));
+                        if (text == null || text.isEmpty()) {
+                            text = "[UNSUPPORTED_FORMAT]";
+                        }
+                        String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
+                        MessageResp message = new MessageResp(username, text, time, true);
+                        messageService.addMessage(message);
                         oldMesId = mesId;
                     }
                     dialogRepository.add(new Dialog(chatId, "telegram", username));
