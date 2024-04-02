@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
+
 @Component
 public class TgHandler {
     private final TelegramBot bot;
@@ -32,38 +33,45 @@ public class TgHandler {
     }
 
     private int oldMesId = -1;
+    private int offset = 0;
 
     @Scheduled(fixedRate = 1000)
-    public void getUpdates() {
-        GetUpdates getUpdates = new GetUpdates();
+    public void newGetUpdates() {
+        GetUpdates getUpdates = new GetUpdates().offset(offset);
         bot.execute(getUpdates, new Callback<GetUpdates, GetUpdatesResponse>() {
             @Override
             public void onResponse(GetUpdates request, GetUpdatesResponse response) {
                 List<Update> updates = response.updates();
-                if (!updates.isEmpty()) {
-                    Update update = updates.get(updates.size() - 1);
-                    int mesId = update.message().messageId();
-                    long chatId = update.message().chat().id();
-                    String username = update.message().chat().firstName() + " " + update.message().chat().lastName();
-                    if (mesId != oldMesId) {
-                        String text = update.message().text();
-                        if (text == null || text.isEmpty()) {
-                            text = "[UNSUPPORTED_FORMAT]";
+                if (updates != null) {
+                    for (int i = 0; i < updates.size(); ++i) {
+                        Update update = updates.get(i);
+                        int mesId = update.message().messageId();
+                        long chatId = update.message().chat().id();
+                        String username = update.message().chat().firstName() + " "
+                                + update.message().chat().lastName();
+                        if (mesId != oldMesId) {
+                            String text = update.message().text();
+                            if (text == null || text.isEmpty()) {
+                                text = "[UNSUPPORTED_FORMAT]";
+                            }
+                            String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")).toString();
+                            MessageResp message = new MessageResp(username, text, time, true);
+                            messageService.addMessage(message);
+                            oldMesId = mesId;
                         }
-                        String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
-                        MessageResp message = new MessageResp(username, text, time, true);
-                        messageService.addMessage(message);
-                        oldMesId = mesId;
+                        dialogRepository.add(new Dialog(chatId, "telegram", username));
+                        if (i == updates.size() - 1) {
+                            offset = update.updateId() + 1;
+                        }
                     }
-                    dialogRepository.add(new Dialog(chatId, "telegram", username));
                 } else {
-                    System.out.println("LIST IS null");
+                    System.out.println("Updates is null");
                 }
             }
 
             @Override
             public void onFailure(GetUpdates request, IOException e) {
-
+                System.out.println(e.getMessage());
             }
         });
     }
