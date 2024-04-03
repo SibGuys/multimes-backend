@@ -1,5 +1,6 @@
 package org.multimes.backend.core.web.service;
 
+import org.multimes.backend.core.web.model.Message;
 import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
@@ -17,12 +18,12 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public void addMessage(MessageResp message) {
-        messageRepository.addMessage(message);
+    public void add(Message message) {
+        messageRepository.add(message);
     }
 
     @Override
-    public List<MessageResp> getAll() {
+    public List<Message> getAll() {
         return messageRepository.getAll();
     }
 

@@ -1,25 +1,52 @@
 package org.multimes.backend.core.web.repository;
 
+import org.multimes.backend.core.web.model.Dialog;
+import org.multimes.backend.core.web.model.Message;
 import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class MessageRepository implements IMessageRepository {
 
-    List<MessageResp> messageList = new ArrayList<>();
+    private final JdbcTemplate jdbcTemplate;
 
-    @Override
-    public void addMessage(MessageResp message) {
-        messageList.add(message);
+    public MessageRepository(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<MessageResp> getAll() {
-        return messageList;
+    public void add(Message message) {
+        String sql = "insert into messages (mes_text, inter_id) values (?, ?)";
+
+        jdbcTemplate.update(sql,
+                message.getText(), message.getInterId());
+
+    }
+
+    @Override
+    public Message getById(int id) {
+        String sql = "select mes_text, inter_id from messages where mes_id = ?";
+
+        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Message.class), id);
+    }
+
+    @Override
+    public List<Message> getAll() {
+        String sql = "select mes_text, inter_id from messages";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+        List<Message> result = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Message message = new Message((String) row.get("mes_text"), (Integer) row.get("inter_id"));
+            result.add(message);
+        }
+        return result;
     }
 
 }

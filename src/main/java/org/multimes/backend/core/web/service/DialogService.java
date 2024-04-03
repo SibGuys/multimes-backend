@@ -5,7 +5,7 @@ import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
 import org.multimes.backend.core.web.service.interfaces.IDialogService;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.List;
 
 @Service
 public class DialogService implements IDialogService {
@@ -16,7 +16,7 @@ public class DialogService implements IDialogService {
         this.interRepository = interRepository;
     }
 
-    public Set<Dialog> getAll() {
+    public List<Dialog> getAll() {
         return interRepository.getAll();
     }
 

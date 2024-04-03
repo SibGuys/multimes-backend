@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import org.multimes.backend.core.web.model.Dialog;
+import org.multimes.backend.core.web.model.Message;
 import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class TgHandler {
@@ -65,10 +65,13 @@ public class TgHandler {
                             }
                             String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
                             MessageResp message = new MessageResp(username, text, time, true);
-                            messageService.addMessage(message);
+                            messageService.add(new Message(text, 1));
                             oldMesId = mesId;
                         }
-                        dialogRepository.add(new Dialog(chatId, "telegram", username));
+                        if (!dialogRepository.checkExistsWithIdInMessenger(chatId)) {
+                            Dialog newDialog = new Dialog(chatId, "telegram", username);
+                            dialogRepository.add(newDialog);
+                        }
                         if (i == updates.size() - 1) {
                             offset = update.updateId() + 1;
                         }
@@ -86,7 +89,7 @@ public class TgHandler {
     }
 
     public void sendMessage(MessageResp message) {
-        Set<Dialog> set = dialogRepository.getAll();
+        List<Dialog> set = dialogRepository.getAll();
         if (!set.isEmpty()) {
             for (Dialog dialog : set) {
                 bot.execute(new SendMessage(dialog.getId(), message.getText()));

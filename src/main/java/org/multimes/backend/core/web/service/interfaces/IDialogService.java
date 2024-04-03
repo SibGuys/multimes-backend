@@ -2,10 +2,10 @@ package org.multimes.backend.core.web.service.interfaces;
 
 import org.multimes.backend.core.web.model.Dialog;
 
-import java.util.Set;
+import java.util.List;
 
 public interface IDialogService {
-    public Set<Dialog> getAll();
+    public List<Dialog> getAll();
 
     public void add(Dialog dialog);
 }

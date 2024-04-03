@@ -5,6 +5,12 @@ public class Dialog {
     private final String messenger;
     private final String username;
 
+    public Dialog() {
+        id = -1;
+        messenger = null;
+        username = null;
+    }
+
     public Dialog(long id, String messenger, String username) {
         this.id = id;
         this.messenger = messenger;
