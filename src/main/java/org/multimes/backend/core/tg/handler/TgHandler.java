@@ -47,14 +47,23 @@ public class TgHandler {
                         Update update = updates.get(i);
                         int mesId = update.message().messageId();
                         long chatId = update.message().chat().id();
-                        String username = update.message().chat().firstName() + " "
-                                + update.message().chat().lastName();
+                        String firstName = update.message().chat().firstName();
+                        String lastName = update.message().chat().lastName();
+                        StringBuffer usernameBuffer = new StringBuffer();
+                        if (firstName != null) {
+                            usernameBuffer.append(firstName);
+                        }
+                        if (lastName != null) {
+                            usernameBuffer.append(" ");
+                            usernameBuffer.append(lastName);
+                        }
+                        String username = usernameBuffer.toString();
                         if (mesId != oldMesId) {
                             String text = update.message().text();
                             if (text == null || text.isEmpty()) {
                                 text = "[UNSUPPORTED_FORMAT]";
                             }
-                            String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")).toString();
+                            String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
                             MessageResp message = new MessageResp(username, text, time, true);
                             messageService.addMessage(message);
                             oldMesId = mesId;
