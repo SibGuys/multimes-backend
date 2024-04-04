@@ -2,20 +2,27 @@ package org.multimes.backend.core.web.model;
 
 public class Message {
     private final String text;
+    private final boolean isInter;
     private final int interId;
 
     public Message() {
         text = null;
+        isInter = false;
         interId = -1;
     }
 
-    public Message(String text, int interId) {
+    public Message(String text, boolean isInter, int interId) {
         this.text = text;
+        this.isInter = isInter;
         this.interId = interId;
     }
 
     public String getText() {
         return text;
+    }
+
+    public boolean getIsInter() {
+        return isInter;
     }
 
     public int getInterId() {

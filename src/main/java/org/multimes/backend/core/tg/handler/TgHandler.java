@@ -58,6 +58,10 @@ public class TgHandler {
                             usernameBuffer.append(lastName);
                         }
                         String username = usernameBuffer.toString();
+                        if (!dialogRepository.checkExistsWithIdInMessenger(chatId)) {
+                            Dialog newDialog = new Dialog(chatId, "telegram", username);
+                            dialogRepository.add(newDialog);
+                        }
                         if (mesId != oldMesId) {
                             String text = update.message().text();
                             if (text == null || text.isEmpty()) {
@@ -65,12 +69,8 @@ public class TgHandler {
                             }
                             String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
                             MessageResp message = new MessageResp(username, text, time, true);
-                            messageService.add(new Message(text, 1));
+                            messageService.add(new Message(text, true, 1));
                             oldMesId = mesId;
-                        }
-                        if (!dialogRepository.checkExistsWithIdInMessenger(chatId)) {
-                            Dialog newDialog = new Dialog(chatId, "telegram", username);
-                            dialogRepository.add(newDialog);
                         }
                         if (i == updates.size() - 1) {
                             offset = update.updateId() + 1;

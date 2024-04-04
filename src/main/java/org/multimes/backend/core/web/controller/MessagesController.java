@@ -24,14 +24,14 @@ public class MessagesController {
     public List<MessageResp> getAllMessages() {
         List<MessageResp> resps = new ArrayList<>();
         for (Message message : messageService.getAll()) {
-            resps.add(new MessageResp("null", message.getText(), "null", true));
+            resps.add(new MessageResp("null", message.getText(), "null", message.getIsInter()));
         }
         return resps;
     }
 
     @PostMapping
     public void sendMessage(@RequestBody MessageResp message) {
-        messageService.add(new Message(message.getText(), 1));
+        messageService.add(new Message(message.getText(), false, 1));
         tgHandler.sendMessage(message);
     }
 

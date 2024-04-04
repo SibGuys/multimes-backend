@@ -1,7 +1,6 @@
 package org.multimes.backend.core.web.service;
 
 import org.multimes.backend.core.web.model.Message;
-import org.multimes.backend.core.web.model.response.MessageResp;
 import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
 import org.springframework.stereotype.Service;
