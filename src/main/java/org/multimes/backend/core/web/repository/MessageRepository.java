@@ -11,7 +11,6 @@ import java.util.Map;
 
 @Repository
 public class MessageRepository implements IMessageRepository {
-
     private final JdbcTemplate jdbcTemplate;
 
     public MessageRepository(JdbcTemplate jdbcTemplate) {
@@ -41,5 +40,4 @@ public class MessageRepository implements IMessageRepository {
         }
         return result;
     }
-
 }

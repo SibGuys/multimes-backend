@@ -2,6 +2,7 @@ package org.multimes.backend.core.tg.handler;
 
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -35,6 +36,24 @@ public class TgHandler {
     private int oldMesId = -1;
     private int offset = 0;
 
+    private String getFullName(Chat chat) {
+        String firstName = chat.firstName();
+        String lastName = chat.lastName();
+        StringBuffer usernameBuffer = new StringBuffer();
+        if (firstName != null) {
+            usernameBuffer.append(firstName);
+        }
+        if (lastName != null) {
+            usernameBuffer.append(" ");
+            usernameBuffer.append(lastName);
+        }
+        return usernameBuffer.toString();
+    }
+
+    private String getCurrentTime() {
+        return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
+    }
+
     @Scheduled(fixedRate = 1000)
     public void newGetUpdates() {
         GetUpdates getUpdates = new GetUpdates().offset(offset);
@@ -46,18 +65,9 @@ public class TgHandler {
                     for (int i = 0; i < updates.size(); ++i) {
                         Update update = updates.get(i);
                         int mesId = update.message().messageId();
-                        long chatId = update.message().chat().id();
-                        String firstName = update.message().chat().firstName();
-                        String lastName = update.message().chat().lastName();
-                        StringBuffer usernameBuffer = new StringBuffer();
-                        if (firstName != null) {
-                            usernameBuffer.append(firstName);
-                        }
-                        if (lastName != null) {
-                            usernameBuffer.append(" ");
-                            usernameBuffer.append(lastName);
-                        }
-                        String username = usernameBuffer.toString();
+                        Chat chat = update.message().chat();
+                        long chatId = chat.id();
+                        String username = getFullName(chat);
                         int interId = dialogRepository.checkExistsWithIdInMessenger(chatId);
                         if (interId == -1) {
                             Dialog newDialog = new Dialog(-1, chatId, username, "telegram");
@@ -68,7 +78,7 @@ public class TgHandler {
                             if (text == null || text.isEmpty()) {
                                 text = "[UNSUPPORTED_FORMAT]";
                             }
-                            String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
+                            String time = getCurrentTime();
                             messageRepository.add(new Message(-1, text, time, true, interId));
                             oldMesId = mesId;
                         }

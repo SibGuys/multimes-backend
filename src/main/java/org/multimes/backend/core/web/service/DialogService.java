@@ -11,7 +11,6 @@ import java.util.List;
 
 @Service
 public class DialogService implements IDialogService {
-
     private final IDialogRepository interRepository;
 
     public DialogService(IDialogRepository interRepository) {

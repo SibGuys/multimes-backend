@@ -17,7 +17,6 @@ import java.util.List;
 
 @Service
 public class MessageService implements IMessageService {
-
     private final IMessageRepository messageRepository;
 
     private final IDialogRepository dialogRepository;

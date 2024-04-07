@@ -14,7 +14,6 @@ import java.util.Map;
 
 @Repository
 public class DialogRepository implements IDialogRepository {
-
     private final JdbcTemplate jdbcTemplate;
 
     public DialogRepository(JdbcTemplate jdbcTemplate) {
@@ -84,5 +83,4 @@ public class DialogRepository implements IDialogRepository {
         }
         return result;
     }
-
 }
