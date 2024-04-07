@@ -25,7 +25,7 @@ public class AllMessagesByDialogIdResponse {
         return time;
     }
 
-    public boolean isInter() {
+    public boolean getIsInter() {
         return isInter;
     }
 

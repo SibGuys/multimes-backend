@@ -76,8 +76,6 @@ public class TgHandler {
                             offset = update.updateId() + 1;
                         }
                     }
-                } else {
-                    System.out.println("Updates is null");
                 }
             }
 

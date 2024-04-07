@@ -2,8 +2,6 @@ package org.multimes.backend.core.web.repository;
 
 import org.multimes.backend.core.web.model.entities.Dialog;
 import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
@@ -41,7 +39,14 @@ public class DialogRepository implements IDialogRepository {
     @Override
     public Dialog getById(int id) {
         String sql = "select * from inters where inter_id = ?";
-        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Dialog.class), id);
+        Dialog dialog = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            int interId = rs.getInt("inter_id");
+            long idInMessenger = rs.getLong("id_in_messenger");
+            String fullName = rs.getString("full_name");
+            String messengerType = rs.getString("messenger_type");
+            return new Dialog(interId, idInMessenger, fullName, messengerType);
+        }, id);
+        return dialog;
     }
 
     @Override

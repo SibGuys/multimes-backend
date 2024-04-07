@@ -3,6 +3,7 @@ package org.multimes.backend.core.web.service;
 import org.multimes.backend.core.tg.handler.TgHandler;
 import org.multimes.backend.core.web.model.dto.requests.SendMessageRequest;
 import org.multimes.backend.core.web.model.dto.responses.AllMessagesByDialogIdResponse;
+import org.multimes.backend.core.web.model.entities.Dialog;
 import org.multimes.backend.core.web.model.entities.Message;
 import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
 import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
@@ -35,7 +36,8 @@ public class MessageService implements IMessageService {
         String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
         Message m = new Message(-1, message.getText(), time, false, message.getDialogId());
         messageRepository.add(m);
-        long chatId = dialogRepository.getById(message.getDialogId()).getIdInMessenger();
+        Dialog dialog = dialogRepository.getById(message.getDialogId());
+        long chatId = dialog.getIdInMessenger();
         tgHandler.sendMessage(chatId, message.getText());
     }
 

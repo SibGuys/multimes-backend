@@ -1,5 +1,6 @@
 package org.multimes.backend.core.web.controller;
 
+import org.multimes.backend.core.web.model.dto.responses.AllDialogsResponse;
 import org.multimes.backend.core.web.service.interfaces.IDialogService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +17,8 @@ public class DialogController {
         this.dialogService = dialogService;
     }
 
-    // @GetMapping
-    // public List<DialogDTO> getAllDialogs() {
-    // return dialogService.getAll().stream().toList();
-    // }
+    @GetMapping
+    public List<AllDialogsResponse> getAllDialogs() {
+        return dialogService.getAll();
+    }
 }
