@@ -1,32 +1,30 @@
-package org.multimes.backend.core.web.model;
+package org.multimes.backend.core.web.model.dto.requests;
 
-public class Message {
+public class SendMessageRequest {
     private final String text;
-    private final boolean isInter;
-    private final int interId;
+    private final int dialogId;
 
-    public Message() {
-        text = null;
-        isInter = false;
-        interId = -1;
+    public SendMessageRequest() {
+        this.text = null;
+        this.dialogId = -1;
     }
 
-    public Message(String text, boolean isInter, int interId) {
+    public SendMessageRequest(String text, int dialogId) {
         this.text = text;
-        this.isInter = isInter;
-        this.interId = interId;
+        this.dialogId = dialogId;
     }
 
     public String getText() {
         return text;
     }
 
-    public boolean getIsInter() {
-        return isInter;
+    public int getDialogId() {
+        return dialogId;
     }
 
-    public int getInterId() {
-        return interId;
+    @Override
+    public String toString() {
+        return "SendMessageRequest [text=" + text + ", dialogId=" + dialogId + "]";
     }
 
     @Override
@@ -34,7 +32,7 @@ public class Message {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((text == null) ? 0 : text.hashCode());
-        result = prime * result + interId;
+        result = prime * result + dialogId;
         return result;
     }
 
@@ -46,13 +44,13 @@ public class Message {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Message other = (Message) obj;
+        SendMessageRequest other = (SendMessageRequest) obj;
         if (text == null) {
             if (other.text != null)
                 return false;
         } else if (!text.equals(other.text))
             return false;
-        if (interId != other.interId)
+        if (dialogId != other.dialogId)
             return false;
         return true;
     }

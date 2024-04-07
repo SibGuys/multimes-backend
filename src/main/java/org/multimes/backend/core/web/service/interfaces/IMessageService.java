@@ -1,11 +1,12 @@
 package org.multimes.backend.core.web.service.interfaces;
 
-import org.multimes.backend.core.web.model.Message;
+import org.multimes.backend.core.web.model.dto.requests.SendMessageRequest;
+import org.multimes.backend.core.web.model.dto.responses.AllMessagesByDialogIdResponse;
 
 import java.util.List;
 
 public interface IMessageService {
-    List<Message> getAll();
+    public void add(SendMessageRequest message);
 
-    public void add(Message message);
+    List<AllMessagesByDialogIdResponse> getAllByInterId(int id);
 }

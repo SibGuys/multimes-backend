@@ -1,8 +1,7 @@
 package org.multimes.backend.core.web.controller;
 
 import org.multimes.backend.core.tg.handler.TgHandler;
-import org.multimes.backend.core.web.model.Message;
-import org.multimes.backend.core.web.model.response.MessageResp;
+import org.multimes.backend.core.web.model.entities.Message;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,19 +19,16 @@ public class MessagesController {
         this.tgHandler = tgHandler;
     }
 
-    @GetMapping
-    public List<MessageResp> getAllMessages() {
-        List<MessageResp> resps = new ArrayList<>();
-        for (Message message : messageService.getAll()) {
-            resps.add(new MessageResp("null", message.getText(), "null", message.getIsInter()));
-        }
-        return resps;
-    }
+    // @GetMapping
+    // public List<MessageDTO> getAllMessages(@RequestBody int id) {
+    //     return messageService.getAllByInterId(id);
+    // }
 
-    @PostMapping
-    public void sendMessage(@RequestBody MessageResp message) {
-        messageService.add(new Message(message.getText(), false, 1));
-        tgHandler.sendMessage(message);
-    }
+    // @PostMapping
+    // public void sendMessage(@RequestBody MessageDTO message) {
+    //     Message m = new Message(-1, message.getText(), message.getMessageTime(), message.getIsInter(), 1);
+    //     messageService.add(m);
+    //     tgHandler.sendMessage(null);
+    // }
 
 }

@@ -6,11 +6,11 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
-import org.multimes.backend.core.web.model.Dialog;
-import org.multimes.backend.core.web.model.Message;
-import org.multimes.backend.core.web.model.response.MessageResp;
+
+import org.multimes.backend.core.web.model.entities.Dialog;
+import org.multimes.backend.core.web.model.entities.Message;
 import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
-import org.multimes.backend.core.web.service.interfaces.IMessageService;
+import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +23,12 @@ import java.util.List;
 public class TgHandler {
     private final TelegramBot bot;
 
-    private final IMessageService messageService;
+    private final IMessageRepository messageRepository;
     private final IDialogRepository dialogRepository;
 
-    public TgHandler(TelegramBot bot, IMessageService messageService, IDialogRepository dialogRepository) {
+    public TgHandler(TelegramBot bot, IMessageRepository messageRepository, IDialogRepository dialogRepository) {
         this.bot = bot;
-        this.messageService = messageService;
+        this.messageRepository = messageRepository;
         this.dialogRepository = dialogRepository;
     }
 
@@ -58,9 +58,10 @@ public class TgHandler {
                             usernameBuffer.append(lastName);
                         }
                         String username = usernameBuffer.toString();
-                        if (!dialogRepository.checkExistsWithIdInMessenger(chatId)) {
-                            Dialog newDialog = new Dialog(chatId, "telegram", username);
-                            dialogRepository.add(newDialog);
+                        int interId = dialogRepository.checkExistsWithIdInMessenger(chatId);
+                        if (interId == -1) {
+                            Dialog newDialog = new Dialog(-1, chatId, username, "telegram");
+                            interId = dialogRepository.add(newDialog);
                         }
                         if (mesId != oldMesId) {
                             String text = update.message().text();
@@ -68,8 +69,7 @@ public class TgHandler {
                                 text = "[UNSUPPORTED_FORMAT]";
                             }
                             String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
-                            MessageResp message = new MessageResp(username, text, time, true);
-                            messageService.add(new Message(text, true, 1));
+                            messageRepository.add(new Message(-1, text, time, true, interId));
                             oldMesId = mesId;
                         }
                         if (i == updates.size() - 1) {
@@ -88,12 +88,7 @@ public class TgHandler {
         });
     }
 
-    public void sendMessage(MessageResp message) {
-        List<Dialog> set = dialogRepository.getAll();
-        if (!set.isEmpty()) {
-            for (Dialog dialog : set) {
-                bot.execute(new SendMessage(dialog.getId(), message.getText()));
-            }
-        }
+    public void sendMessage(long chatId, String message) {
+        bot.execute(new SendMessage(chatId, message));
     }
 }
