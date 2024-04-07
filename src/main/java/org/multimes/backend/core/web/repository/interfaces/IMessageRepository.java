@@ -1,11 +1,11 @@
 package org.multimes.backend.core.web.repository.interfaces;
 
-import org.multimes.backend.core.web.model.response.MessageResp;
+import org.multimes.backend.core.web.model.entities.Message;
 
 import java.util.List;
 
 public interface IMessageRepository {
-    List<MessageResp> getAll();
+    public void add(Message message);
 
-    public void addMessage(MessageResp message);
+    public List<Message> getAllByInterId(int id);
 }

@@ -1,7 +1,7 @@
 package org.multimes.backend.core.web.controller;
 
-import org.multimes.backend.core.tg.handler.TgHandler;
-import org.multimes.backend.core.web.model.response.MessageResp;
+import org.multimes.backend.core.web.model.dto.requests.SendMessageRequest;
+import org.multimes.backend.core.web.model.dto.responses.AllMessagesByDialogIdResponse;
 import org.multimes.backend.core.web.service.interfaces.IMessageService;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,22 +11,19 @@ import java.util.List;
 @RequestMapping("/messages")
 public class MessagesController {
     private final IMessageService messageService;
-    private final TgHandler tgHandler;
 
-    public MessagesController(IMessageService messageService, TgHandler tgHandler) {
+    public MessagesController(IMessageService messageService) {
         this.messageService = messageService;
-        this.tgHandler = tgHandler;
     }
 
     @GetMapping
-    public List<MessageResp> getAllMessages() {
-        return messageService.getAll();
+    public List<AllMessagesByDialogIdResponse> getAllMessages(@RequestParam int id) {
+        return messageService.getAllByInterId(id);
     }
 
     @PostMapping
-    public void sendMessage(@RequestBody MessageResp message) {
-        messageService.addMessage(message);
-        tgHandler.sendMessage(message);
+    public void sendMessage(@RequestBody SendMessageRequest message) {
+        messageService.add(message);
     }
 
 }

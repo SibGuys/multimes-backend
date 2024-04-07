@@ -2,14 +2,16 @@ package org.multimes.backend.core.tg.handler;
 
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
-import org.multimes.backend.core.web.model.Dialog;
-import org.multimes.backend.core.web.model.response.MessageResp;
+
+import org.multimes.backend.core.web.model.entities.Dialog;
+import org.multimes.backend.core.web.model.entities.Message;
 import org.multimes.backend.core.web.repository.interfaces.IDialogRepository;
-import org.multimes.backend.core.web.service.interfaces.IMessageService;
+import org.multimes.backend.core.web.repository.interfaces.IMessageRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,23 +19,40 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class TgHandler {
     private final TelegramBot bot;
 
-    private final IMessageService messageService;
+    private final IMessageRepository messageRepository;
     private final IDialogRepository dialogRepository;
 
-    public TgHandler(TelegramBot bot, IMessageService messageService, IDialogRepository dialogRepository) {
+    public TgHandler(TelegramBot bot, IMessageRepository messageRepository, IDialogRepository dialogRepository) {
         this.bot = bot;
-        this.messageService = messageService;
+        this.messageRepository = messageRepository;
         this.dialogRepository = dialogRepository;
     }
 
     private int oldMesId = -1;
     private int offset = 0;
+
+    private String getFullName(Chat chat) {
+        String firstName = chat.firstName();
+        String lastName = chat.lastName();
+        StringBuffer usernameBuffer = new StringBuffer();
+        if (firstName != null) {
+            usernameBuffer.append(firstName);
+        }
+        if (lastName != null) {
+            usernameBuffer.append(" ");
+            usernameBuffer.append(lastName);
+        }
+        return usernameBuffer.toString();
+    }
+
+    private String getCurrentTime() {
+        return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
+    }
 
     @Scheduled(fixedRate = 1000)
     public void newGetUpdates() {
@@ -46,35 +65,27 @@ public class TgHandler {
                     for (int i = 0; i < updates.size(); ++i) {
                         Update update = updates.get(i);
                         int mesId = update.message().messageId();
-                        long chatId = update.message().chat().id();
-                        String firstName = update.message().chat().firstName();
-                        String lastName = update.message().chat().lastName();
-                        StringBuffer usernameBuffer = new StringBuffer();
-                        if (firstName != null) {
-                            usernameBuffer.append(firstName);
+                        Chat chat = update.message().chat();
+                        long chatId = chat.id();
+                        String username = getFullName(chat);
+                        int interId = dialogRepository.checkExistsWithIdInMessenger(chatId);
+                        if (interId == -1) {
+                            Dialog newDialog = new Dialog(-1, chatId, username, "telegram");
+                            interId = dialogRepository.add(newDialog);
                         }
-                        if (lastName != null) {
-                            usernameBuffer.append(" ");
-                            usernameBuffer.append(lastName);
-                        }
-                        String username = usernameBuffer.toString();
                         if (mesId != oldMesId) {
                             String text = update.message().text();
                             if (text == null || text.isEmpty()) {
                                 text = "[UNSUPPORTED_FORMAT]";
                             }
-                            String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")).toString();
-                            MessageResp message = new MessageResp(username, text, time, true);
-                            messageService.addMessage(message);
+                            String time = getCurrentTime();
+                            messageRepository.add(new Message(-1, text, time, true, interId));
                             oldMesId = mesId;
                         }
-                        dialogRepository.add(new Dialog(chatId, "telegram", username));
                         if (i == updates.size() - 1) {
                             offset = update.updateId() + 1;
                         }
                     }
-                } else {
-                    System.out.println("Updates is null");
                 }
             }
 
@@ -85,12 +96,7 @@ public class TgHandler {
         });
     }
 
-    public void sendMessage(MessageResp message) {
-        Set<Dialog> set = dialogRepository.getAll();
-        if (!set.isEmpty()) {
-            for (Dialog dialog : set) {
-                bot.execute(new SendMessage(dialog.getId(), message.getText()));
-            }
-        }
+    public void sendMessage(long chatId, String message) {
+        bot.execute(new SendMessage(chatId, message));
     }
 }
