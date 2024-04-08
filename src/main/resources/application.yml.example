@@ -2,9 +2,10 @@ spring:
   application:
     name: backend
   datasource:
-    driver: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/
-    username:
-    password:
+    multimes:
+      driver: org.postgresql.Driver
+      jdbcUrl: jdbc:postgresql://localhost:5432/
+      username:
+      password:
 tg:
   bot-token:
