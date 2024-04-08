@@ -7,7 +7,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,13 +25,13 @@ public class DialogRepository implements IDialogRepository {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(
                 conn -> {
-                    PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql, new String[] { "inter_id" });
                     preparedStatement.setLong(1, dialog.getIdInMessenger());
                     preparedStatement.setString(2, dialog.getFullName());
                     preparedStatement.setString(3, dialog.getMessengerType());
                     return preparedStatement;
                 }, generatedKeyHolder);
-        return (Integer) generatedKeyHolder.getKeys().get("inter_id");
+        return (Integer) generatedKeyHolder.getKey();
     }
 
     @Override
